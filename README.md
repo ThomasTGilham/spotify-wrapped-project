@@ -37,17 +37,12 @@ cd <your-repository-name>
 
 ## 2. Get Spotify Credentials
 
-Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) and create a new application.
-
-In your app settings, add the following Redirect URI:
-
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) and create a new application.
+2. In your app settings, add the following Redirect URI:
+```arduino
 http://127.0.0.1:8888/callback
-
-yaml
-Copy
-Edit
-
-Note your **Client ID** and **Client Secret**.
+```
+3. Note your **Client ID** and **Client Secret**.
 
 ---
 
