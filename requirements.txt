@@ -1,0 +1,27 @@
+# For making API calls to Spotify
+requests==2.28.2
+
+# For connecting Python to PostgreSQL (use binary for easy install)
+psycopg2-binary==2.9.5
+
+# REQUIRED to fix the Airflow 2.5.1 build error
+pendulum<3
+
+# For transforming data with dbt
+dbt-postgres
+
+# For data manipulation
+pandas
+
+# Missing dependency for Airflow's web UI
+Flask-Session
+
+# REQUIRED to prevent SQLAlchemy 2.0 incompatibility
+SQLAlchemy<2.0
+
+# For data visualisation
+seaborn
+matplotlib
+
+# (Optional) For loading .env files directly in Python scripts
+python-dotenv==1.0.0

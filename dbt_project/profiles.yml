@@ -1,0 +1,12 @@
+spotify_wrapped:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: airflow
+      password: testpassword # The hardcoded password
+      port: 5432
+      dbname: airflow
+      schema: public
+      threads: 1

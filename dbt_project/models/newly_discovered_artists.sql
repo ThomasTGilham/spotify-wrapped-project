@@ -1,0 +1,1 @@
+{{ get_newly_discovered_artists(start_date=var('start_date')) }}

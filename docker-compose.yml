@@ -1,0 +1,107 @@
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: my-spotify-postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=testpassword #${PG_PASSWORD}
+      - POSTGRES_DB=airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow-init:
+    build:
+      context: .
+      args:
+        AIRFLOW_VERSION: 2.5.1
+    container_name: my-spotify-airflow-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - PYTHONPATH=/opt/airflow 
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:testpassword@postgres/airflow
+    command:
+      - bash
+      - -c
+      - |
+        echo "Waiting 10 seconds for PostgreSQL to be fully ready..."
+        sleep 10
+        echo "Starting Airflow DB upgrade..."
+        airflow db upgrade
+        airflow users create \
+          --username admin \
+          --firstname Thomas \
+          --lastname Trainor-Gilham \
+          --role Admin \
+          --email thomastrainorgilham@gmail.com \
+          --password ${AIRFLOW_ADMIN_PASSWORD}
+
+  webserver:
+      build:
+        context: .
+        args:
+          AIRFLOW_VERSION: 2.5.1
+      container_name: my-spotify-airflow-webserver
+      restart: always
+      depends_on:
+        airflow-init:
+          condition: service_completed_successfully
+      ports:
+        - "8080:8080"
+      volumes:
+        - ./dbt_project:/opt/airflow/dbt_project
+        - ./dags:/opt/airflow/dags
+        - ./include:/opt/airflow/include  
+      command: airflow webserver
+      environment:
+        - AIRFLOW__WEBSERVER__SECRET_KEY=0bdc6752302693ddef4548286d9caab1
+        - PYTHONPATH=/opt/airflow
+        - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+        - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:testpassword@postgres/airflow
+        - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
+        - AIRFLOW__SMTP__SMTP_HOST=smtp.gmail.com
+        - AIRFLOW__SMTP__SMTP_PORT=587
+        - AIRFLOW__SMTP__SMTP_USER=thomastrainorgilham@gmail.com
+        - AIRFLOW__SMTP__SMTP_PASSWORD=${SMTP_PASSWORD} # Use a simpler variable name
+        - AIRFLOW__SMTP__SMTP_STARTTLS=True
+        - AIRFLOW__CORE__LOAD_EXAMPLES=False
+
+  scheduler:
+      build:
+        context: .
+        args:
+          AIRFLOW_VERSION: 2.5.1
+      container_name: my-spotify-airflow-scheduler
+      restart: always
+      depends_on:
+        airflow-init:
+          condition: service_completed_successfully
+      volumes:
+        - ./dbt_project:/opt/airflow/dbt_project
+        - ./dags:/opt/airflow/dags
+        - ./include:/opt/airflow/include
+      command: airflow scheduler
+      environment:
+        - AIRFLOW__WEBSERVER__SECRET_KEY=0bdc6752302693ddef4548286d9caab1
+        - PYTHONPATH=/opt/airflow 
+        - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+        - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:testpassword@postgres/airflow
+        - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
+        - AIRFLOW__SMTP__SMTP_HOST=smtp.gmail.com
+        - AIRFLOW__SMTP__SMTP_PORT=587
+        - AIRFLOW__SMTP__SMTP_USER=thomastrainorgilham@gmail.com
+        - AIRFLOW__SMTP__SMTP_PASSWORD=${SMTP_PASSWORD}
+        - AIRFLOW__SMTP__SMTP_STARTTLS=True
+        - AIRFLOW__CORE__LOAD_EXAMPLES=False
+
+volumes:
+  postgres_data:

@@ -1,0 +1,23 @@
+name: 'spotify_wrapped'
+version: '1.0.0'
+config-version: 2
+
+# This is the name of the profile in your profiles.yml file
+profile: 'spotify_wrapped'
+
+# Tells dbt where to find your files
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Tells dbt where to put compiled files
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# We are removing the complex 'models:' block for now.
+# dbt will default to creating models as views, which is what we want.
