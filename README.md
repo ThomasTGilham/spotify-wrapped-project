@@ -1,4 +1,4 @@
-# Personalized Spotify Wrapped Data Pipeline
+# Personalised Spotify Wrapped Data Pipeline
 
 This project implements an automated data pipeline to extract, transform, and analyze personal Spotify listening history, culminating in a personalized "Spotify Wrapped" style dashboard.
 
