@@ -3,8 +3,8 @@ import base64
 from urllib.parse import urlencode
 
 # IMPORTANT: Paste your Client ID and Client Secret here
-CLIENT_ID = "dfabde46df244a3bad69e53455c9cbc4"
-CLIENT_SECRET = "3d7848189f9c4893a2f487aab7ec006a"
+CLIENT_ID = "your client ID here"
+CLIENT_SECRET = "your client secret here"
 REDIRECT_URI = "http://127.0.0.1:8888/callback"
 
 # Step 1: Get the Authorization URL
